@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Servicio 1: Nuestra API de Python/Flask
+  api:
+    build: .  # Construye la imagen usando el Dockerfile en este directorio 
+    ports:
+      - "5000:5000" # Mapea el puerto 5000 del host al 5000 del contenedor
+    volumes:
+      - .:/app # Sincroniza el código local con el del contenedor (para desarrollo)
+    environment:
+      - DB_HOST=db
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=mysecretpassword
+    depends_on:
+      - db # Le dice a Docker que inicie la 'db' antes que la 'api'
+
+  # Servicio 2: La base de datos PostgreSQL
+  db:
+    image: postgres:14-alpine # Usa una imagen oficial de Postgres de Docker Hub [cite: 12]
+    ports:
+      - "5432:5432" # Mapea el puerto de la base de datos
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Guarda los datos de la BD
+
+volumes:
+  postgres_data:
